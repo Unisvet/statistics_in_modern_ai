@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Statistics in Modern AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMdCKZP2n4Ur//gcgeUstMAOTdK7DuNuUfsgf9zje_y4A70Yk" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .katex-display {
+            margin: 0.5em 0;
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8">
+            <div id="quiz-header" class="mb-6">
+                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">Statistics in Modern AI</h1>
+                 <p class="text-center text-gray-600 dark:text-gray-400">Test your knowledge on how statistical concepts apply to AI.</p>
+                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="question-area">
+                <p id="question-counter" class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2"></p>
+                <h2 id="question-text" class="text-xl font-semibold mb-6 min-h-[6rem]"></h2>
+                <div id="answer-options" class="space-y-3">
+                    <!-- Answer buttons will be dynamically inserted here -->
+                </div>
+            </div>
+            
+            <div id="feedback-area" class="mt-6 hidden">
+                 <p id="rationale-text" class="text-gray-700 dark:text-gray-300 p-4 rounded-lg bg-gray-100 dark:bg-gray-700"></p>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button id="next-button" class="hidden bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Next Question
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="results-container" class="hidden w-full max-w-md mx-auto text-center">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Quiz Complete!</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">Your final score is:</p>
+            <p id="score-text" class="text-5xl font-extrabold text-blue-600 dark:text-blue-400 mb-8"></p>
+            <button id="restart-button" class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                Restart Quiz
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+              "question": "You are tasked with explaining to business stakeholders *why* customer churn is happening. You build a logistic regression model. Which Python library would be your primary tool for this task, and what is the null hypothesis for a feature like 'customer_age'?",
+              "answerOptions": [
+                { "text": "`scikit-learn`, because it's optimized for predictive accuracy. The null hypothesis is that the model's overall accuracy is no better than chance.", "isCorrect": false, "rationale": "`scikit-learn` is excellent for prediction, but its primary design goal isn't to provide the detailed statistical summaries needed for explanation. The null hypothesis described here relates to the model as a whole, not a specific feature." },
+                { "text": "`statsmodels`. The null hypothesis is $H_0: \\beta_{age} = 0$, meaning customer age has no effect on churn.", "isCorrect": true, "rationale": "`statsmodels` is designed for statistical inference and provides detailed outputs like p-values for coefficients, which is ideal for explanation. The null hypothesis correctly states that the coefficient for the 'age' feature is zero, implying no relationship." },
+                { "text": "`statsmodels`. The null hypothesis is $H_0: \\beta_{age} \\ne 0$, meaning customer age has a significant effect on churn.", "isCorrect": false, "rationale": "`statsmodels` is the correct library choice for this task. However, this statement describes the alternative hypothesis ($H_A$), which is what you are trying to find evidence for, not the default assumption of no effect." },
+                { "text": "`scikit-learn`, because it contains all the necessary tools for model evaluation. The null hypothesis is that the p-value for 'customer_age' is less than 0.05.", "isCorrect": false, "rationale": "While `scikit-learn` is a comprehensive library, it intentionally does not provide p-values for regression coefficients. Furthermore, a p-value is a result of a test, not the hypothesis itself." }
+              ]
+            },
+            {
+              "question": "In a linear regression model summary from `statsmodels`, the feature 'ad_spend' has a p-value of 0.98. How should you interpret this result in the context of the 'Volume Knob Test' analogy?",
+              "answerOptions": [
+                { "text": "The 'ad_spend' knob is extremely powerful and has a strong, statistically significant effect on the outcome.", "isCorrect": false, "rationale": "A high p-value (much greater than 0.05) indicates a lack of statistical significance, which is the opposite of a strong effect." },
+                { "text": "The high p-value means we have proven the null hypothesis is true and 'ad_spend' definitively has no effect.", "isCorrect": false, "rationale": "Statistical tests allow us to reject or fail to reject the null hypothesis; they do not allow us to 'prove' it is true. A high p-value simply means we lack sufficient evidence to say there is an effect." },
+                { "text": "The 'ad_spend' knob is likely a dummy. We fail to reject the null hypothesis and conclude the feature is not statistically significant.", "isCorrect": true, "rationale": "The p-value of 0.98 indicates a 98% probability of observing the data if the null hypothesis (no effect) were true. This provides no evidence to reject the null, so we treat the feature as not significant, like a disconnected knob." },
+                { "text": "The effect of 'ad_spend' is significant, but the confidence interval is very wide.", "isCorrect": false, "rationale": "A p-value of 0.98 is the very definition of a non-significant effect. A non-significant result will have a confidence interval that comfortably contains zero." }
+              ]
+            },
+            {
+              "question": "Your team has built a regression model to predict house prices. You need to provide the marketing team with a price range for a *specific new house* hitting the market. Which type of interval should you calculate and why?",
+              "answerOptions": [
+                { "text": "A confidence interval, because it quantifies the uncertainty around the regression line's mean prediction.", "isCorrect": false, "rationale": "The confidence interval describes uncertainty for the average prediction, not for a single point. It would be too narrow for predicting a specific house price." },
+                { "text": "A prediction interval, because it must account for both the model's uncertainty and the irreducible error of an individual data point.", "isCorrect": true, "rationale": "A prediction interval is designed to provide a range for a single future observation. It is correctly wider than a confidence interval because it incorporates both the uncertainty in the model's parameters and the inherent randomness of any specific house." },
+                { "text": "A confidence interval, because it is always wider than a prediction interval and therefore provides a safer estimate.", "isCorrect": false, "rationale": "This statement has the relationship backwards; the prediction interval must always be wider than the confidence interval for the same confidence level." },
+                { "text": "A prediction interval, because it only measures the uncertainty in the model's estimated coefficients.", "isCorrect": false, "rationale": "This only describes one part of the uncertainty. The key feature of a prediction interval is that it also includes the individual error term ($\\epsilon$)." }
+              ]
+            },
+            {
+              "question": "To compare a new `RandomForestClassifier` against an old `LogisticRegression` model, you use 10-fold cross-validation, ensuring both models are trained and tested on the exact same folds. What is the correct statistical test to determine if there's a significant performance difference?",
+              "answerOptions": [
+                { "text": "An independent t-test, because the two models are different algorithms.", "isCorrect": false, "rationale": "While the models are different, the performance scores are not independent; they are paired by the cross-validation fold. An independent t-test is inappropriate for this structure." },
+                { "text": "A Chi-Squared test, to check the association between model type and accuracy.", "isCorrect": false, "rationale": "A Chi-Squared test is typically used for categorical data to test for independence or goodness-of-fit, not for comparing the means of continuous performance scores." },
+                { "text": "A paired t-test, because the accuracy scores from each fold are paired samples for the two models.", "isCorrect": true, "rationale": "This is the correct choice. The paired t-test is specifically designed to compare the means of two related groups, such as the accuracy scores of two models tested on the same set of data folds." },
+                { "text": "Calculate the confidence interval for each model's mean accuracy and see if they overlap.", "isCorrect": false, "rationale": "While checking for overlapping confidence intervals can be a quick heuristic, it is not a formal statistical test and can sometimes lead to incorrect conclusions, especially when the intervals only slightly overlap." }
+              ]
+            },
+            {
+              "question": "An analyst runs 50 different regression models, each with a different combination of features. They find one model where a specific feature has a p-value of 0.04 and enthusiastically report this feature as a key driver. This is a classic example of what statistical pitfall?",
+              "answerOptions": [
+                { "text": "The Texas Sharpshooter Fallacy (P-Hacking)", "isCorrect": true, "rationale": "By running many tests and only reporting the one that was 'significant' by chance, the analyst is drawing a conclusion after seeing the data, which is the definition of p-hacking." },
+                { "text": "Misinterpreting the confidence interval", "isCorrect": false, "rationale": "The primary error here is related to the process of repeated hypothesis testing, not the interpretation of a confidence interval itself." },
+                { "text": "Low statistical power", "isCorrect": false, "rationale": "Running many tests does not relate to low power; in fact, the issue is that with enough tests, you are almost guaranteed to find a significant result even if none exists." },
+                { "text": "Incorrectly specifying the null hypothesis", "isCorrect": false, "rationale": "The null hypothesis for the feature (that its coefficient is zero) was likely specified correctly for each test; the error lies in the repeated testing process." }
+              ]
+            },
+            {
+              "question": "An A/B test for a new checkout button on a website with millions of users shows a statistically significant increase in conversions (p=0.001). However, the effect size (Cohen's d) is 0.01. What is the most appropriate business conclusion?",
+              "answerOptions": [
+                { "text": "The result is not trustworthy because the p-value is too low and likely an error.", "isCorrect": false, "rationale": "A very low p-value indicates strong evidence against the null hypothesis; it does not suggest an error. The result is likely real." },
+                { "text": "The new button is a massive success and should be rolled out immediately due to its strong statistical significance.", "isCorrect": false, "rationale": "This conclusion ignores the effect size. While the effect is real, its magnitude is very small, which may not translate to a 'massive success.'" },
+                { "text": "Although the effect is statistically real, its practical significance is negligible. The business must weigh the tiny conversion lift against the cost of deployment.", "isCorrect": true, "rationale": "This correctly separates the statistical verdict (the effect is real) from the practical one (the effect is tiny). The decision to implement depends on whether this small gain is worth the cost, a key business consideration." },
+                { "text": "The effect size is small, which invalidates the p-value. The test should be re-run until the effect size is larger.", "isCorrect": false, "rationale": "The effect size and p-value are different measures and do not invalidate each other. Re-running the test to get a desired result is a form of p-hacking." }
+              ]
+            },
+            {
+              "question": "When A/B testing two different prompts for an LLM, you use an 'LLM-as-a-judge' to rate the helpfulness of each response on a scale of 1-5. What is the null hypothesis for this specific quality metric?",
+              "answerOptions": [
+                { "text": "$H_0$: The average helpfulness score for Prompt B is greater than the average score for Prompt A.", "isCorrect": false, "rationale": "This describes a potential alternative hypothesis, not the null hypothesis of no difference." },
+                { "text": "$H_0$: The cost and latency of the two prompts are identical.", "isCorrect": false, "rationale": "This is a valid null hypothesis, but it is for the operational metrics (cost, latency), not the quality metric (helpfulness score) specified in the question." },
+                { "text": "$H_0$: The mean helpfulness score for responses from Prompt A is equal to the mean helpfulness score for responses from Prompt B.", "isCorrect": true, "rationale": "This correctly formulates the null hypothesis of no difference between the two groups (prompts) for the specific metric being measured (mean helpfulness score)." },
+                { "text": "$H_0$: The LLM will always produce helpful responses regardless of the prompt.", "isCorrect": false, "rationale": "This is a general statement about the LLM's capability, not a formal, testable null hypothesis for comparing two specific prompts." }
+              ]
+            },
+            {
+              "question": "What is the primary goal of using Monte Carlo (MC) Dropout during inference with a Large Language Model?",
+              "answerOptions": [
+                { "text": "To speed up the model's prediction time by using a smaller network.", "isCorrect": false, "rationale": "MC Dropout requires running inference multiple times, which significantly slows down prediction time, rather than speeding it up." },
+                { "text": "To estimate the model's epistemic uncertainty by creating a distribution of possible outputs.", "isCorrect": true, "rationale": "By running inference many times with different dropout masks, we generate a sample of outputs. The variance in this sample serves as a proxy for the model's own lack of knowledge, or epistemic uncertainty." },
+                { "text": "To fine-tune the model on new data during the inference step.", "isCorrect": false, "rationale": "MC Dropout is a technique for uncertainty quantification, not for updating the model's weights or fine-tuning it." },
+                { "text": "To reduce aleatoric uncertainty inherent in the training data.", "isCorrect": false, "rationale": "Aleatoric uncertainty is irreducible noise in the data itself. MC dropout is designed to measure epistemic uncertainty, which is the model's own ignorance." }
+              ]
+            },
+            {
+              "question": "In the Multi-Armed Bandit problem, how does the Thompson Sampling algorithm use Bayesian principles to balance exploration and exploitation?",
+              "answerOptions": [
+                { "text": "It always chooses the arm with the highest estimated payout, avoiding all risk.", "isCorrect": false, "rationale": "This describes a purely exploitative (greedy) strategy, not Thompson Sampling. It fails to explore potentially better arms." },
+                { "text": "It explores by choosing a completely random arm a fixed percentage of the time (epsilon).", "isCorrect": false, "rationale": "This describes the epsilon-greedy algorithm. Thompson Sampling's exploration is more targeted, not purely random." },
+                { "text": "It maintains a probability distribution of the likely payout for each arm and samples from these distributions to choose an action.", "isCorrect": true, "rationale": "This is the core mechanism of Thompson Sampling. Arms with high uncertainty have wider distributions, giving them a chance to be selected (exploration), while arms with high known payouts are selected consistently (exploitation)." },
+                { "text": "It first explores all arms an equal number of times before committing to the best one for all future trials.", "isCorrect": false, "rationale": "This describes an 'explore-then-commit' strategy, which is different from Thompson Sampling's continuous and adaptive balancing of exploration and exploitation throughout the process." }
+              ]
+            },
+            {
+              "question": "What is the core mechanism that makes the Boruta algorithm for feature selection more robust than simple backward elimination based on p-values?",
+              "answerOptions": [
+                { "text": "It uses a more powerful underlying model (Random Forest), which guarantees better feature selection.", "isCorrect": false, "rationale": "While it uses a Random Forest, the model itself isn't the primary source of robustness. The key is how the importance scores are judged." },
+                { "text": "It iteratively removes the feature with the highest p-value until all remaining features are significant.", "isCorrect": false, "rationale": "This describes the process of backward elimination, not the Boruta algorithm." },
+                { "text": "It compares the importance of real features against the importance of 'shadow features' created from random noise.", "isCorrect": true, "rationale": "This is the unique and powerful idea behind Boruta. It establishes a data-driven threshold for importance by benchmarking features against randomness itself, making it less arbitrary than a p-value cutoff." },
+                { "text": "It selects the top 'k' features based on their correlation with the target variable.", "isCorrect": false, "rationale": "This describes a univariate filter method, which is simpler and less robust than Boruta's all-relevant approach." }
+              ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionText = document.getElementById('question-text');
+        const questionCounter = document.getElementById('question-counter');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const feedbackArea = document.getElementById('feedback-area');
+        const rationaleText = document.getElementById('rationale-text');
+        const nextButton = document.getElementById('next-button');
+        const restartButton = document.getElementById('restart-button');
+        const scoreText = document.getElementById('score-text');
+        const progressBar = document.getElementById('progress-bar');
+        
+        function startQuiz() {
+            // Shuffle questions and answers for variety each time
+            quizData.forEach(q => {
+                q.answerOptions.sort(() => Math.random() - 0.5);
+            });
+            quizData.sort(() => Math.random() - 0.5);
+
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            feedbackArea.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            questionText.innerHTML = currentQuestion.question;
+            
+            answerOptionsContainer.innerHTML = '';
+            currentQuestion.answerOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.text;
+                button.classList.add('option-btn', 'w-full', 'text-left', 'p-4', 'rounded-lg', 'border', 'border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'hover:bg-gray-100', 'dark:hover:bg-gray-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500');
+                button.onclick = () => selectAnswer(option, button);
+                answerOptionsContainer.appendChild(button);
+            });
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Render LaTeX
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+
+        function selectAnswer(selectedOption, selectedButton) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = selectedOption.isCorrect;
+
+            if (isCorrect) {
+                score++;
+            }
+            
+            // Show feedback
+            rationaleText.textContent = selectedOption.rationale;
+            feedbackArea.classList.remove('hidden');
+
+            // Disable all buttons and show correct/incorrect styles
+            Array.from(answerOptionsContainer.children).forEach((button, index) => {
+                button.disabled = true;
+                const option = currentQuestion.answerOptions[index];
+
+                if (option.isCorrect) {
+                    button.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700', 'border-gray-300');
+                    button.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-500', 'dark:border-green-600', 'ring-2', 'ring-green-500');
+                } else if (button === selectedButton) {
+                    button.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700', 'border-gray-300');
+                    button.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-500', 'dark:border-red-600', 'ring-2', 'ring-red-500');
+                }
+            });
+
+            nextButton.classList.remove('hidden');
+        }
+
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            scoreText.textContent = `${score} / ${quizData.length}`;
+            
+            // Final progress bar update
+            progressBar.style.width = '100%';
+        }
+        
+        nextButton.addEventListener('click', handleNextQuestion);
+        restartButton.addEventListener('click', startQuiz);
+
+        // Initial load
+        window.onload = startQuiz;
+
+    </script>
+</body>
+</html>
